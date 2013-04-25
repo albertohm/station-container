@@ -1,8 +1,6 @@
 # Update apt cache
 include_recipe 'apt'
 
-# Include dependencies
-
 # Configure the basic system
 include_recipe 'station::user'
 
@@ -18,6 +16,18 @@ end
 
 # User should be vagrant or 'aentos'
 node['instance_role'] ||= 'aentos'
+
+# Sigar
+bash "Download Sigar" do
+  user node['station']['user_name']
+  code "sudo wget 'http://svn.hyperic.org/projects/sigar_bin/dist/SIGAR_1_6_5/lib/libsigar-amd64-linux.so' -O /usr/lib/libsigar-amd64-linux.so"
+end
+
+# Iptables
+bash "Configure iptables" do
+  user node['station']['user_name']
+  code "sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 9080"
+end
 
 # Java
 if node['station']['java']
@@ -38,6 +48,8 @@ if node['station']['java']
     #code "update-java-alternatives -s java-7-oracle"
   end
 end
+
+#TBD: Syslog to Papertrail
 
 # Neo4j
 bash "Download Neo4j" do
@@ -63,7 +75,4 @@ bash "Configure DB storage" do
   code "sudo mkdir -p /srv/storage/databases; sudo chown 1000:1000 /srv/storage/databases"
 end
 
-bash "Configure iptables" do
-  user node['station']['user_name']
-  code "sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 9080"
-end
+#TBD: Start the server
