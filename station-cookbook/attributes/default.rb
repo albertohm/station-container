@@ -22,7 +22,7 @@ default['station']['java'] = true
 
 # Dependencies
 default['station']['packages']['base'] = %w{
-  vim screen tmux git bash-completion
+  vim screen tmux git bash-completion python-software-properties
 }
 default['station']['packages']['required'] = %w{
  cpulimit mdadm
